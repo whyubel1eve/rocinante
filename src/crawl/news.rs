@@ -1,5 +1,6 @@
 use scraper::{Html, Selector};
 
+
 pub async fn parse_news() -> Result<(), reqwest::Error>  {
     let resp = reqwest::get("")
         .await?
