@@ -11,7 +11,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Lookup International BBC news
+    /// Lookup BBC news
     News,
     /// Lookup this week's European and American music charts
     Music,
@@ -19,14 +19,14 @@ enum Commands {
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
-    let _cli = Cli::parse();
+    let cli = Cli::parse();
 
     match &cli.command {
         Commands::News => {
-            crawl::news::parse_news()
+            crawl::news::parse_news().await?
         }
         Commands::Music => {
-            crawl::music::parse_music()
+            crawl::music::parse_music().await?
         }
     }
 
