@@ -8,3 +8,5 @@ description = "Does awesome things"
 
 [dependencies]
 clap = { version = "3.2.17", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }

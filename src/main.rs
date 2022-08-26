@@ -1,3 +1,5 @@
+mod crawl;
+
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -15,14 +17,18 @@ enum Commands {
     Music,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), reqwest::Error> {
     let _cli = Cli::parse();
 
-    // You can check for the existence of subcommands, and if found use their
-    // matches just as you would the top level cmd
-    // match &cli.command {
-    //     Commands::News => {
-    //
-    //     }
-    // }
+    match &cli.command {
+        Commands::News => {
+            crawl::news::parse_news()
+        }
+        Commands::Music => {
+            crawl::music::parse_music()
+        }
+    }
+
+    Ok(())
 }
