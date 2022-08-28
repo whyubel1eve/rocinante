@@ -2,7 +2,7 @@ use scraper::{Html, Selector};
 use colorful::Color;
 use colorful::Colorful;
 
-pub async fn parse_cs(id: &String) -> Result<(), reqwest::Error>  {
+pub async fn parse_cs_stat(id: &String) -> Result<(), reqwest::Error>  {
     let resp = reqwest::get(format!("https://www.csgola.com/player/{}", id))
         .await?
         .text()
@@ -35,4 +35,31 @@ pub async fn parse_cs(id: &String) -> Result<(), reqwest::Error>  {
 
     Ok(())
 }
+pub async fn parse_cs_ranking() -> Result<(), reqwest::Error> {
+    let resp = reqwest::get("https://www.hltv.org/ranking/teams/")
+        .await?
+        .text()
+        .await?;
+    let doc = Html::parse_fragment(&resp);
 
+    let one = Selector::parse(".relative").unwrap();
+    let team_sel = Selector::parse(".teamLine").unwrap();
+    let sub_team_sel = Selector::parse(".name").unwrap();
+    let players_sel = Selector::parse(".rankingNicknames").unwrap();
+
+    let mut count = 1;
+    for el in doc.select(&one) {
+        let team = el.select(&team_sel).next().unwrap().select(&sub_team_sel)
+            .next().unwrap().inner_html();
+        print!("[{}]. {} ", count, format!("| {} | :", team).gradient(Color::LightYellow));
+        for p in el.select(&players_sel) {
+            let player = p.select(&Selector::parse("span").unwrap())
+                .next().unwrap().inner_html();
+            print!("{}, ", player.gradient(Color::Cyan))
+        }
+        println!();
+        count += 1;
+    }
+
+    Ok(())
+}
