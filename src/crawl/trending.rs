@@ -1,6 +1,7 @@
 use scraper::{Html, Selector};
 use colorful::{Color};
 use colorful::Colorful;
+use chrono::prelude::*;
 
 pub async fn parse_trending(weibo: bool, zhihu: bool) -> Result<(), reqwest::Error>  {
     if weibo && zhihu {
@@ -15,6 +16,8 @@ pub async fn parse_trending(weibo: bool, zhihu: bool) -> Result<(), reqwest::Err
         let doc = Html::parse_fragment(&resp);
         let sel = Selector::parse(".HotList-itemTitle").unwrap();
         let mut count = 1;
+
+        println!("  {}", Local::now().format("%a %Y-%m-%d %H:%M:%S").to_string().gradient(Color::LightCyan3));
 
         for event in doc.select(&sel) {
             if count > 50 { break }
@@ -32,6 +35,8 @@ pub async fn parse_trending(weibo: bool, zhihu: bool) -> Result<(), reqwest::Err
         let sel = Selector::parse(".al").unwrap();
         let sub_sel = Selector::parse("a").unwrap();
         let mut count = 1;
+
+        println!("  {}", Local::now().format("%a %Y-%m-%d %H:%M:%S").to_string().gradient(Color::LightCyan3));
 
         for el in doc.select(&sel) {
             if count > 50 { break }
