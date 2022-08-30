@@ -61,7 +61,7 @@ enum WalletCommands {
         #[clap(short, long, value_parser, default_value_t = String::from("main"))]
         network: String,
     },
-    /// Create a new wallet
+    /// Create a new account
     New,
 }
 
