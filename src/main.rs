@@ -14,7 +14,7 @@ struct Cli {
 enum Commands {
     /// Lookup this week's European and American music charts
     Music,
-    /// Lookup CSGO statistic by steam_id
+    /// Lookup CSGO statistic
     CS(CS),
     /// Lookup recent trending
     Trending {
@@ -23,7 +23,7 @@ enum Commands {
         #[clap(long, action)]
         zhihu: bool,
     },
-    /// An ethereum wallet
+    /// A simple ethereum wallet
     Wallet(Wallet),
 }
 
@@ -63,6 +63,14 @@ enum WalletCommands {
     },
     /// Create a new account
     New,
+    /// Lookup transaction by hash
+    Transaction {
+        #[clap(short, long, value_parser)]
+        id: String,
+        #[clap(short, long, value_parser, default_value_t = String::from("main"))]
+        network: String,
+    }
+
 }
 
 
@@ -96,6 +104,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 WalletCommands::Balance { address, network} => {
                     rocinante::wallet::balance(address, network).await.expect("fail to execute wallet balance command")
+                }
+                WalletCommands::Transaction { id, network } => {
+                    rocinante::wallet::transaction(id, network).await.expect("fail to execute wallet transaction command")
                 }
             }
         }
