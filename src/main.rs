@@ -1,7 +1,10 @@
 mod rocinante;
 
 use std::error::Error;
+use std::fs::OpenOptions;
+use std::io::{BufReader, Read};
 use clap::{Args, Parser, Subcommand};
+use serde::{Deserialize};
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -73,9 +76,24 @@ enum WalletCommands {
 
 }
 
+#[derive(Deserialize)]
+pub struct Conf {
+    eth_network: Api
+}
+#[derive(Deserialize)]
+struct Api {
+    main_api: String,
+    goerli_api: String,
+}
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    let mut buf = BufReader::new(OpenOptions::new().read(true).open("config.toml")?);
+    let mut conf = String::new();
+    buf.read_to_string(&mut conf).unwrap();
+    let config: Conf = toml::from_str(&conf).unwrap();
+
     let cli = Cli::parse();
 
     match &cli.command {
@@ -103,10 +121,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     rocinante::wallet::new().await.expect("fail to execute new wallet command")
                 }
                 WalletCommands::Balance { address, network} => {
-                    rocinante::wallet::balance(address, network).await.expect("fail to execute wallet balance command")
+                    rocinante::wallet::balance(address, network, &config).await.expect("fail to execute wallet balance command")
                 }
                 WalletCommands::Transaction { id, network } => {
-                    rocinante::wallet::transaction(id, network).await.expect("fail to execute wallet transaction command")
+                    rocinante::wallet::transaction(id, network, &config).await.expect("fail to execute wallet transaction command")
                 }
             }
         }

@@ -1,0 +1,3 @@
+[eth_network]
+main_api = "https://mainnet.infura.io/v3/4828ef93cc7346c9af614be8e52c440b"
+goerli_api = "https://goerli.infura.io/v3/4828ef93cc7346c9af614be8e52c440b"

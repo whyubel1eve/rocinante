@@ -1,5 +1,5 @@
 use std::fs::OpenOptions;
-use std::io::BufWriter;
+use std::io::{BufWriter};
 use std::str::FromStr;
 use colorful::{Color};
 use colorful::Colorful;
@@ -9,7 +9,7 @@ use web3::signing::keccak256;
 use web3::types::{Address, H256, U256};
 use serde::{Serialize, Deserialize};
 use web3::types::TransactionId::Hash;
-
+use crate::Conf;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Wallet {
@@ -51,15 +51,17 @@ pub async fn new() -> web3::Result<()> {
     Ok(())
 }
 
-pub async fn balance(addr: &String, network: &String) -> web3::Result<()> {
-    let api;
+pub async fn balance(addr: &String, network: &String, conf: &Conf) -> web3::Result<()> {
     let network = Network::from_str(network).unwrap();
 
+    let url;
+
     match network {
-        Network::Main=> { api = "https://mainnet.infura.io/v3/4828ef93cc7346c9af614be8e52c440b" }
-        Network::Goerli => { api = "https://goerli.infura.io/v3/4828ef93cc7346c9af614be8e52c440b" }
+        Network::Main => { url = &conf.eth_network.main_api }
+        Network::Goerli => { url = &conf.eth_network.goerli_api }
     }
-    let transport = web3::transports::Http::new(api)?;
+
+    let transport = web3::transports::Http::new(url)?;
     let web3 = web3::Web3::new(transport);
 
     let balance = web3.eth().balance(Address::from_str(addr).unwrap(), None).await?;
@@ -69,15 +71,15 @@ pub async fn balance(addr: &String, network: &String) -> web3::Result<()> {
     Ok(())
 }
 
-pub async fn transaction(id: &String, network: &String) -> web3::Result<()> {
-    let api;
+pub async fn transaction(id: &String, network: &String, conf: &Conf) -> web3::Result<()> {
     let network = Network::from_str(network).unwrap();
 
+    let url;
     match network {
-        Network::Main=> { api = "https://mainnet.infura.io/v3/4828ef93cc7346c9af614be8e52c440b" }
-        Network::Goerli => { api = "https://goerli.infura.io/v3/4828ef93cc7346c9af614be8e52c440b" }
+        Network::Main => { url = &conf.eth_network.main_api }
+        Network::Goerli => { url = &conf.eth_network.goerli_api }
     }
-    let transport = web3::transports::Http::new(api)?;
+    let transport = web3::transports::Http::new(url)?;
     let web3 = web3::Web3::new(transport);
 
     let hash: Result<H256, _> = serde_json::from_str(&format!(r#""{}""#, id));
