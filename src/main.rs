@@ -18,7 +18,7 @@ enum Commands {
     /// Lookup this week's European and American music charts
     Music,
     /// Lookup CSGO statistic
-    CS(CS),
+    Csgo(Csgo),
     /// Lookup recent trending
     Trending {
         #[clap(long, action)]
@@ -32,7 +32,7 @@ enum Commands {
 
 #[derive(Args)]
 #[clap(args_conflicts_with_subcommands = true)]
-struct CS {
+struct Csgo {
     #[clap(subcommand)]
     command: CSCommands,
 }
@@ -100,7 +100,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Commands::Music => {
             rocinante::music::parse_music().await.expect("fail to execute music command")
         }
-        Commands::CS(cs) => {
+        Commands::Csgo(cs) => {
             let cs_cmd = &cs.command;
             match cs_cmd {
                 CSCommands::Stat { id } => {
